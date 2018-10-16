@@ -1,9 +1,11 @@
 import os
 import csv
+import re
 import pycountry
 import sqlite3
 from .utils import remove_non_ascii, fuzzy_match
 from collections import Counter
+
 """
 Takes a list of place names and works place designation (country, region, etc) 
 and relationships between places (city is inside region is inside country, etc)
@@ -58,6 +60,68 @@ class PlaceContext(object):
 
         return s
 
+    def get_location(self, l):
+        if not self.db_has_data():
+            self.populate_db()
+
+        cur = self.conn.cursor()
+        where = ''
+        columns = []
+
+        if "country" in l:
+            country = re.sub("[ \.']+", "", l['country'])
+            where += ' and (REPLACE(REPLACE(country_iso_code, \' \', \'\'), \'.\', \'\') like "' + country + '" OR REPLACE(REPLACE(country_name, \' \', \'\'), \'.\', \'\') like "' + country + '")'
+            l.pop('country', None)
+
+        if "state" in l:
+            state = re.sub("[ \.']+", "", l['state'])
+            where += ' and (REPLACE(REPLACE(subdivision_iso_code, \' \', \'\'), \'.\', \'\') like "' + state + '" OR REPLACE(REPLACE(subdivision_name, \' \', \'\'), \'.\', \'\') like "' + state + '")'
+            l.pop('state', None)
+
+        if "city" in l:
+            city = re.sub("[ \.']+", "", l['city'])
+            where += ' and (REPLACE(REPLACE(city_name, \' \', \'\'), \'.\', \'\') like "' + city + '")'
+            l.pop('city', None)
+
+        if "country" in l and "state" in l:
+            columns = [
+                'lower(country_iso_code) as country_code',
+                'lower(country_name) as country_name',
+                'lower(subdivision_iso_code) as region_code',
+                'lower(subdivision_name) as region_name'
+            ]
+        else:
+            columns = [
+                'lower(country_iso_code) as country_code',
+                'lower(country_name) as country_name',
+                'lower(subdivision_iso_code) as region_code',
+                'lower(subdivision_name) as region_name',
+                'lower(city_name) as city'
+            ]
+
+        select_cloumns = ', '.join(columns)
+
+        query = "SELECT DISTINCT " + select_cloumns + " FROM cities WHERE 1" + where;
+
+        cur.execute(query)
+        rows = cur.fetchall()
+
+        for row in rows:
+            l['country_code'] = row[0]
+            l['country_name'] = row[1]
+            l['region_code'] = row[2]
+            l['region_name'] = row[3]
+
+            try:
+                l['city'] = row[4]
+            except IndexError:
+                a = None
+
+        if len(rows):
+            return l
+        else:
+            return None
+
     def is_a_country(self, s):
         s = self.correct_country_mispelling(s)
         try:
@@ -71,8 +135,7 @@ class PlaceContext(object):
             self.populate_db()
 
         cur = self.conn.cursor()
-        cur.execute('SELECT * FROM cities WHERE ' + column_name + ' = "' +
-                    place_name + '"')
+        cur.execute('SELECT * FROM cities WHERE ' + column_name + ' like "' + place_name + '"')
         rows = cur.fetchall()
 
         if len(rows) > 0:
