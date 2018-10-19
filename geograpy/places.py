@@ -83,16 +83,21 @@ class PlaceContext(object):
             where += ' and (REPLACE(REPLACE(city_name, \' \', \'\'), \'.\', \'\') like "' + city + '")'
             l.pop('city', None)
 
+        if "city_district" in l:
+            city = re.sub("[ \.']+", "", l['city_district'])
+            where += ' and (REPLACE(REPLACE(city_name, \' \', \'\'), \'.\', \'\') like "' + city + '")'
+            l.pop('city_district', None)
+
         if "country" in l and "state" in l:
             columns = [
-                'lower(COALESCE(nullif(secondary_iso_code, \'\'), country_iso_code)) as country_iso_code',
+                'lower(country_iso_code) as country_iso_code',
                 'lower(country_name) as country_name',
                 'lower(subdivision_iso_code) as region_code',
                 'lower(subdivision_name) as region_name'
             ]
         else:
             columns = [
-                'lower(COALESCE(nullif(secondary_iso_code, \'\'), country_iso_code)) as country_iso_code',
+                'lower(country_iso_code) as country_iso_code',
                 'lower(country_name) as country_name',
                 'lower(subdivision_iso_code) as region_code',
                 'lower(subdivision_name) as region_name',
