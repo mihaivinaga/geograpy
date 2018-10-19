@@ -25,14 +25,14 @@ class PlaceContext(object):
         cur.execute("DROP TABLE IF EXISTS cities")
 
         cur.execute(
-            "CREATE TABLE cities(geoname_id INTEGER, continent_code TEXT, continent_name TEXT, country_iso_code TEXT, country_name TEXT, subdivision_iso_code TEXT, subdivision_name TEXT, city_name TEXT, metro_code TEXT, time_zone TEXT)"
+            "CREATE TABLE cities(geoname_id INTEGER, continent_code TEXT, continent_name TEXT, country_iso_code TEXT, secondary_iso_code TEXT, country_name TEXT, subdivision_iso_code TEXT, subdivision_name TEXT, city_name TEXT, metro_code TEXT, time_zone TEXT)"
         )
         cur_dir = os.path.dirname(os.path.realpath(__file__))
         with open(cur_dir + "/data/GeoLite2-City-Locations.csv", "rt") as info:
             reader = csv.reader(info)
             for row in reader:
                 cur.execute(
-                    "INSERT INTO cities VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+                    "INSERT INTO cities VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
                     row)
 
             self.conn.commit()
@@ -70,7 +70,7 @@ class PlaceContext(object):
 
         if "country" in l:
             country = re.sub("[ \.']+", "", l['country'])
-            where += ' and (REPLACE(REPLACE(country_iso_code, \' \', \'\'), \'.\', \'\') like "' + country + '" OR REPLACE(REPLACE(country_name, \' \', \'\'), \'.\', \'\') like "' + country + '")'
+            where += ' and (REPLACE(REPLACE(country_iso_code, \' \', \'\'), \'.\', \'\') like "' + country + '" OR REPLACE(REPLACE(secondary_iso_code, \' \', \'\'), \'.\', \'\') like "' + country + '" OR REPLACE(REPLACE(country_name, \' \', \'\'), \'.\', \'\') like "' + country + '")'
             l.pop('country', None)
 
         if "state" in l:
@@ -85,14 +85,14 @@ class PlaceContext(object):
 
         if "country" in l and "state" in l:
             columns = [
-                'lower(country_iso_code) as country_code',
+                'lower(COALESCE(nullif(secondary_iso_code, \'\'), country_iso_code)) as country_iso_code',
                 'lower(country_name) as country_name',
                 'lower(subdivision_iso_code) as region_code',
                 'lower(subdivision_name) as region_name'
             ]
         else:
             columns = [
-                'lower(country_iso_code) as country_code',
+                'lower(COALESCE(nullif(secondary_iso_code, \'\'), country_iso_code)) as country_iso_code',
                 'lower(country_name) as country_name',
                 'lower(subdivision_iso_code) as region_code',
                 'lower(subdivision_name) as region_name',
