@@ -69,22 +69,22 @@ class PlaceContext(object):
         columns = []
 
         if "country" in l:
-            country = re.sub("[ \.']+", "", l['country'])
+            country = re.sub("[ \.,']+", "", l['country'])
             where += ' and (REPLACE(REPLACE(country_iso_code, \' \', \'\'), \'.\', \'\') like "' + country + '" OR REPLACE(REPLACE(secondary_iso_code, \' \', \'\'), \'.\', \'\') like "' + country + '" OR REPLACE(REPLACE(country_name, \' \', \'\'), \'.\', \'\') like "' + country + '")'
             l.pop('country', None)
 
         if "state" in l:
-            state = re.sub("[ \.']+", "", l['state'])
+            state = re.sub("[ \.,']+", "", l['state'])
             where += ' and (REPLACE(REPLACE(subdivision_iso_code, \' \', \'\'), \'.\', \'\') like "' + state + '" OR REPLACE(REPLACE(subdivision_name, \' \', \'\'), \'.\', \'\') like "' + state + '")'
             l.pop('state', None)
 
         if "city" in l:
-            city = re.sub("[ \.']+", "", l['city'])
+            city = re.sub("[ \.,']+", "", l['city'])
             where += ' and (REPLACE(REPLACE(city_name, \' \', \'\'), \'.\', \'\') like "' + city + '")'
             l.pop('city', None)
 
         if "city_district" in l:
-            city = re.sub("[ \.']+", "", l['city_district'])
+            city = re.sub("[ \.,']+", "", l['city_district'])
             where += ' and (REPLACE(REPLACE(city_name, \' \', \'\'), \'.\', \'\') like "' + city + '")'
             l.pop('city_district', None)
 
@@ -106,7 +106,7 @@ class PlaceContext(object):
 
         select_cloumns = ', '.join(columns)
 
-        query = "SELECT DISTINCT " + select_cloumns + " FROM cities WHERE 1" + where;
+        query = "SELECT DISTINCT " + select_cloumns + " FROM cities WHERE 1" + where + " LIMIT 1"
 
         cur.execute(query)
         rows = cur.fetchall()
