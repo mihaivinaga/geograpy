@@ -66,7 +66,6 @@ class PlaceContext(object):
 
         cur = self.conn.cursor()
         where = ''
-        columns = []
 
         if "country" in l:
             country = re.sub("[ \.,']+", "", l['country'])
@@ -88,25 +87,18 @@ class PlaceContext(object):
             where += ' and (REPLACE(REPLACE(city_name, \' \', \'\'), \'.\', \'\') like "' + city + '")'
             l.pop('city_district', None)
 
-        if "country" in l and "state" in l:
-            columns = [
-                'lower(country_iso_code) as country_iso_code',
-                'lower(country_name) as country_name',
-                'lower(subdivision_iso_code) as region_code',
-                'lower(subdivision_name) as region_name'
-            ]
-        else:
-            columns = [
-                'lower(country_iso_code) as country_iso_code',
-                'lower(country_name) as country_name',
-                'lower(subdivision_iso_code) as region_code',
-                'lower(subdivision_name) as region_name',
-                'lower(city_name) as city'
-            ]
+        columns = [
+            'lower(country_iso_code) as country_iso_code',
+            'lower(country_name) as country_name',
+            'lower(subdivision_iso_code) as region_code',
+            'lower(subdivision_name) as region_name'
+        ]
+        if "city" in l:
+            columns.append('lower(city_name) as city')
 
-        select_cloumns = ', '.join(columns)
+        select_columns = ', '.join(columns)
 
-        query = "SELECT DISTINCT " + select_cloumns + " FROM cities WHERE 1" + where + " LIMIT 1"
+        query = "SELECT DISTINCT " + select_columns + " FROM cities WHERE 1" + where + " LIMIT 1"
 
         cur.execute(query)
         rows = cur.fetchall()
@@ -120,7 +112,7 @@ class PlaceContext(object):
             try:
                 l['city'] = row[4]
             except IndexError:
-                a = None
+                pass
 
         if len(rows):
             return l

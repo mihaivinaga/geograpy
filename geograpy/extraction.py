@@ -26,6 +26,5 @@ class Extractor(object):
 
         for ne in nes:
             if type(ne) is nltk.tree.Tree:
-                if (ne.label() == 'GPE' or ne.label() == 'PERSON' or
-                        ne.label() == 'ORGANIZATION'):
+                if ne.label() == 'GPE':
                     self.places.append(u' '.join([i[0] for i in ne.leaves()]))
