@@ -25,14 +25,28 @@ class PlaceContext(object):
         cur.execute("DROP TABLE IF EXISTS cities")
 
         cur.execute(
-            "CREATE TABLE cities(geoname_id INTEGER, continent_code TEXT, continent_name TEXT, country_iso_code TEXT, secondary_iso_code TEXT, country_name TEXT, subdivision_iso_code TEXT, subdivision_name TEXT, city_name TEXT, metro_code TEXT, time_zone TEXT)"
+            "CREATE TABLE cities("
+            "geoname_id INTEGER,"
+            "continent_code TEXT,"
+            "continent_name TEXT,"
+            "country_iso_code TEXT,"
+            "secondary_iso_code TEXT,"
+            "country_name TEXT,"
+            "subdivision_1_iso_code TEXT,"
+            "subdivision_1_name TEXT,"
+            "subdivision_2_iso_code TEXT,"
+            "subdivision_2_name TEXT,"
+            "city_name TEXT,"
+            "metro_code TEXT,"
+            "time_zone TEXT,"
+            "is_in_european_union INTEGER)"
         )
         cur_dir = os.path.dirname(os.path.realpath(__file__))
         with open(cur_dir + "/data/GeoLite2-City-Locations.csv", "rt") as info:
             reader = csv.reader(info)
             for row in reader:
                 cur.execute(
-                    "INSERT INTO cities VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+                    "INSERT INTO cities VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
                     row)
 
             self.conn.commit()
@@ -69,8 +83,8 @@ class PlaceContext(object):
         columns = [
             'lower(country_iso_code) as country_iso_code',
             'lower(country_name) as country_name',
-            'lower(subdivision_iso_code) as region_code',
-            'lower(subdivision_name) as region_name'
+            'lower(subdivision_1_iso_code) as region_code',
+            'lower(subdivision_1_name) as region_name'
         ]
 
         if "country" in l:
@@ -80,7 +94,7 @@ class PlaceContext(object):
 
         if "state" in l:
             state = re.sub("[ \.,']+", "", l['state'])
-            where += ' and (REPLACE(REPLACE(subdivision_iso_code, \' \', \'\'), \'.\', \'\') like "' + state + '" OR REPLACE(REPLACE(subdivision_name, \' \', \'\'), \'.\', \'\') like "' + state + '")'
+            where += ' and (REPLACE(REPLACE(subdivision_1_iso_code, \' \', \'\'), \'.\', \'\') like "' + state + '" OR REPLACE(REPLACE(subdivision_1_name, \' \', \'\'), \'.\', \'\') like "' + state + '")'
             l.pop('state', None)
 
         if "city" in l:
@@ -143,7 +157,7 @@ class PlaceContext(object):
         return self.places_by_name(city_name, 'city_name')
 
     def regions_for_name(self, region_name):
-        return self.places_by_name(region_name, 'subdivision_name')
+        return self.places_by_name(region_name, 'subdivision_1_name')
 
     def get_region_names(self, country_name):
         country_name = self.correct_country_mispelling(country_name)
