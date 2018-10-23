@@ -66,6 +66,12 @@ class PlaceContext(object):
 
         cur = self.conn.cursor()
         where = ''
+        columns = [
+            'lower(country_iso_code) as country_iso_code',
+            'lower(country_name) as country_name',
+            'lower(subdivision_iso_code) as region_code',
+            'lower(subdivision_name) as region_name'
+        ]
 
         if "country" in l:
             country = re.sub("[ \.,']+", "", l['country'])
@@ -81,19 +87,12 @@ class PlaceContext(object):
             city = re.sub("[ \.,']+", "", l['city'])
             where += ' and (REPLACE(REPLACE(city_name, \' \', \'\'), \'.\', \'\') like "' + city + '")'
             l.pop('city', None)
+            columns.append('lower(city_name) as city')
 
         if "city_district" in l:
             city = re.sub("[ \.,']+", "", l['city_district'])
             where += ' and (REPLACE(REPLACE(city_name, \' \', \'\'), \'.\', \'\') like "' + city + '")'
             l.pop('city_district', None)
-
-        columns = [
-            'lower(country_iso_code) as country_iso_code',
-            'lower(country_name) as country_name',
-            'lower(subdivision_iso_code) as region_code',
-            'lower(subdivision_name) as region_name'
-        ]
-        if "city" in l:
             columns.append('lower(city_name) as city')
 
         select_columns = ', '.join(columns)
