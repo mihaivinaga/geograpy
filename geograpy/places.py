@@ -80,6 +80,7 @@ class PlaceContext(object):
 
         cur = self.conn.cursor()
         where = ''
+        new_data = {}
         columns = [
             'lower(country_iso_code) as country_iso_code',
             'lower(country_name) as country_name',
@@ -117,18 +118,18 @@ class PlaceContext(object):
         rows = cur.fetchall()
 
         for row in rows:
-            l['country_code'] = row[0]
-            l['country_name'] = row[1]
-            l['region_code'] = row[2]
-            l['region_name'] = row[3]
+            new_data['country_code'] = row[0]
+            new_data['country_name'] = row[1]
+            new_data['region_code'] = row[2]
+            new_data['region_name'] = row[3]
 
             try:
-                l['city'] = row[4]
+                new_data['city'] = row[4]
             except IndexError:
                 pass
 
         if len(rows):
-            return l
+            return new_data
         else:
             return None
 
