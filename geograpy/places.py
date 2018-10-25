@@ -88,6 +88,9 @@ class PlaceContext(object):
             'lower(subdivision_1_name) as region_name'
         ]
 
+        if "city" in l:
+            columns.append('lower(city_name) as city')
+
         if "country" in l:
             country = re.sub("[ \.,']+", "", l['country'])
             where += ' and (REPLACE(REPLACE(country_iso_code, \' \', \'\'), \'.\', \'\') like "' + country + '" OR REPLACE(REPLACE(secondary_iso_code, \' \', \'\'), \'.\', \'\') like "' + country + '" OR REPLACE(REPLACE(country_name, \' \', \'\'), \'.\', \'\') like "' + country + '")'
