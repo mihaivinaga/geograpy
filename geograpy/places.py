@@ -88,9 +88,6 @@ class PlaceContext(object):
             'lower(subdivision_1_name) as region_name'
         ]
 
-        if "city" in l:
-            columns.append('lower(city_name) as city')
-
         if "country" in l:
             country = re.sub("[ \.,']+", "", l['country'])
             where += ' and (REPLACE(REPLACE(country_iso_code, \' \', \'\'), \'.\', \'\') like "' + country + '" OR REPLACE(REPLACE(secondary_iso_code, \' \', \'\'), \'.\', \'\') like "' + country + '" OR REPLACE(REPLACE(country_name, \' \', \'\'), \'.\', \'\') like "' + country + '")'
@@ -106,11 +103,15 @@ class PlaceContext(object):
             where += ' and (REPLACE(REPLACE(city_name, \' \', \'\'), \'.\', \'\') like "' + city + '")'
             l.pop('city', None)
             columns.append('lower(city_name) as city')
-
-        if "city_district" in l:
+        elif "city_district" in l:
             city = re.sub("[ \.,']+", "", l['city_district'])
             where += ' and (REPLACE(REPLACE(city_name, \' \', \'\'), \'.\', \'\') like "' + city + '")'
             l.pop('city_district', None)
+            columns.append('lower(city_name) as city')
+        elif "suburb" in l:
+            city = re.sub("[ \.,']+", "", l['suburb'])
+            where += ' and (REPLACE(REPLACE(city_name, \' \', \'\'), \'.\', \'\') like "' + city + '")'
+            l.pop('suburb', None)
             columns.append('lower(city_name) as city')
 
         select_columns = ', '.join(columns)
