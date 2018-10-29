@@ -124,6 +124,7 @@ class PlaceContext(object):
 
         print('rows')
         print(rows)
+        print(query)
 
         for row in rows:
             new_data['country_code'] = row[0]
