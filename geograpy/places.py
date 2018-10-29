@@ -122,6 +122,9 @@ class PlaceContext(object):
         except sqlite3.OperationalError:
             print("database locked")
 
+        print('rows')
+        print(rows)
+
         for row in rows:
             new_data['country_code'] = row[0]
             new_data['country_name'] = row[1]
