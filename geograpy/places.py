@@ -3,6 +3,7 @@ import csv
 import re
 import pycountry
 import sqlite3
+from unidecode import unidecode
 from .utils import remove_non_ascii, fuzzy_match
 from collections import Counter
 
@@ -88,32 +89,27 @@ class PlaceContext(object):
             'lower(subdivision_1_iso_code) as region_code',
             'lower(subdivision_1_name) as region_name'
         ]
+        geos = {
+            "country": ['country_iso_code', 'secondary_iso_code', 'country_name'],
+            "state": ['subdivision_1_iso_code', 'subdivision_1_name'],
+            "city": ['city_name', 'city_name_v2'],
+            "city_district": ['city_name', 'city_name_v2'],
+            "suburb": ['city_name', 'city_name_v2']
+        }
 
-        if "country" in l:
-            country = re.sub("[ .,']+", "", l['country'])
-            where += ' and (REPLACE(REPLACE(country_iso_code, \' \', \'\'), \'.\', \'\') like "' + country + '" OR REPLACE(REPLACE(secondary_iso_code, \' \', \'\'), \'.\', \'\') like "' + country + '" OR REPLACE(REPLACE(country_name, \' \', \'\'), \'.\', \'\') like "' + country + '")'
-            l.pop('country', None)
-
-        if "state" in l:
-            state = re.sub("[ .,']+", "", l['state'])
-            where += ' and (REPLACE(REPLACE(subdivision_1_iso_code, \' \', \'\'), \'.\', \'\') like "' + state + '" OR REPLACE(REPLACE(subdivision_1_name, \' \', \'\'), \'.\', \'\') like "' + state + '")'
-            l.pop('state', None)
-
-        if "city" in l:
-            city = re.sub("[ .,']+", "", l['city'])
-            where += ' and ((REPLACE(REPLACE(city_name, \' \', \'\'), \'.\', \'\') like "' + city + '") OR REPLACE(REPLACE(city_name_v2, \' \', \'\'), \'.\', \'\') like "' + city + '")'
-            l.pop('city', None)
-            columns.append('lower(city_name) as city')
-        elif "city_district" in l:
-            city = re.sub("[ .,']+", "", l['city_district'])
-            where += ' and ((REPLACE(REPLACE(city_name, \' \', \'\'), \'.\', \'\') like "' + city + '") OR REPLACE(REPLACE(city_name_v2, \' \', \'\'), \'.\', \'\') like "' + city + '")'
-            l.pop('city_district', None)
-            columns.append('lower(city_name) as city')
-        elif "suburb" in l:
-            city = re.sub("[ .,']+", "", l['suburb'])
-            where += ' and ((REPLACE(REPLACE(city_name, \' \', \'\'), \'.\', \'\') like "' + city + '") OR REPLACE(REPLACE(city_name_v2, \' \', \'\'), \'.\', \'\') like "' + city + '")'
-            l.pop('suburb', None)
-            columns.append('lower(city_name) as city')
+        for key, values in geos.items():
+            if key in l:
+                geo_value = re.sub("[ .,']+", "", l[key])
+                where += ' and ('
+                str_or = ''
+                for value in values:
+                    where += str_or + 'REPLACE(REPLACE(REPLACE("' + value + '", \' \', \'\'), \'.\', \'\'), \'-\', \'\') like "' + unidecode(geo_value) + '"'
+                    str_or = ' OR '
+                l.pop(key, None)
+                where += ' )'
+                if values == geos['city']:
+                    columns.append('lower(city_name) as city')
+                    break
 
         select_columns = ', '.join(columns)
 

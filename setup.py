@@ -2,7 +2,7 @@ from setuptools import setup
 import os
 import sys
 if sys.version_info > (2,7):
-   ins = ['numpy','nltk','newspaper3k','jellyfish','pycountry']
+   ins = ['numpy','nltk','newspaper3k','jellyfish','pycountry', 'unidecode']
 else:
    ins = ['numpy','nltk','newspaper','jellyfish','pycountry']
 
