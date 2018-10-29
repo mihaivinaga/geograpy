@@ -92,10 +92,13 @@ class PlaceContext(object):
         geos = {
             "country": ['country_iso_code', 'secondary_iso_code', 'country_name'],
             "state": ['subdivision_1_iso_code', 'subdivision_1_name'],
-            "city": ['city_name', 'city_name_v2'],
-            "city_district": ['city_name', 'city_name_v2'],
-            "suburb": ['city_name', 'city_name_v2']
+            "city": ['city_name', 'city_name_v2']
         }
+
+        if 'city' not in l and 'city_district' in l:
+            geos['city_district'] = ['city_name', 'city_name_v2']
+        elif 'city' not in l and 'city_district' not in l and 'suburb' in l:
+            geos['suburb'] = ['city_name', 'city_name_v2']
 
         for key, values in geos.items():
             if key in l:
@@ -107,9 +110,6 @@ class PlaceContext(object):
                     str_or = ' OR '
                 l.pop(key, None)
                 where += ' )'
-                if values == geos['city']:
-                    columns.append('lower(city_name) as city')
-                    # break
 
         select_columns = ', '.join(columns)
 
