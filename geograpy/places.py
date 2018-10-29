@@ -101,17 +101,17 @@ class PlaceContext(object):
 
         if "city" in l:
             city = re.sub("[ .,']+", "", l['city'])
-            where += ' and (REPLACE(REPLACE(city_name, \' \', \'\'), \'.\', \'\') like "' + city + '") OR REPLACE(REPLACE(city_name_v2, \' \', \'\'), \'.\', \'\') like "' + city + '")'
+            where += ' and ((REPLACE(REPLACE(city_name, \' \', \'\'), \'.\', \'\') like "' + city + '") OR REPLACE(REPLACE(city_name_v2, \' \', \'\'), \'.\', \'\') like "' + city + '")'
             l.pop('city', None)
             columns.append('lower(city_name) as city')
         elif "city_district" in l:
             city = re.sub("[ .,']+", "", l['city_district'])
-            where += ' and (REPLACE(REPLACE(city_name, \' \', \'\'), \'.\', \'\') like "' + city + '") OR REPLACE(REPLACE(city_name_v2, \' \', \'\'), \'.\', \'\') like "' + city + '")'
+            where += ' and ((REPLACE(REPLACE(city_name, \' \', \'\'), \'.\', \'\') like "' + city + '") OR REPLACE(REPLACE(city_name_v2, \' \', \'\'), \'.\', \'\') like "' + city + '")'
             l.pop('city_district', None)
             columns.append('lower(city_name) as city')
         elif "suburb" in l:
             city = re.sub("[ .,']+", "", l['suburb'])
-            where += ' and (REPLACE(REPLACE(city_name, \' \', \'\'), \'.\', \'\') like "' + city + '") OR REPLACE(REPLACE(city_name_v2, \' \', \'\'), \'.\', \'\') like "' + city + '")'
+            where += ' and ((REPLACE(REPLACE(city_name, \' \', \'\'), \'.\', \'\') like "' + city + '") OR REPLACE(REPLACE(city_name_v2, \' \', \'\'), \'.\', \'\') like "' + city + '")'
             l.pop('suburb', None)
             columns.append('lower(city_name) as city')
 
