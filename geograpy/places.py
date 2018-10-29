@@ -17,7 +17,7 @@ class PlaceContext(object):
     def __init__(self, place_names, db_file=None):
         db_file = db_file or os.path.dirname(
             os.path.realpath(__file__)) + "/locs.db"
-        self.conn = sqlite3.connect(db_file)
+        self.conn = sqlite3.connect(db_file, timeout=10)
         self.conn.text_factory = lambda x: str(x, 'utf-8', 'ignore')
         self.places = place_names
 
@@ -114,9 +114,13 @@ class PlaceContext(object):
         select_columns = ', '.join(columns)
 
         query = "SELECT DISTINCT " + select_columns + " FROM cities WHERE 1" + where + ' LIMIT 2'
+        rows = []
 
-        cur.execute(query)
-        rows = cur.fetchall()
+        try:
+            cur.execute(query)
+            rows = cur.fetchall()
+        except sqlite3.OperationalError:
+            print("database locked")
 
         for row in rows:
             new_data['country_code'] = row[0]
