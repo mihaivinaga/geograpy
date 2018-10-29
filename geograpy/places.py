@@ -109,7 +109,7 @@ class PlaceContext(object):
                 where += ' )'
                 if values == geos['city']:
                     columns.append('lower(city_name) as city')
-                    break
+                    # break
 
         select_columns = ', '.join(columns)
 
