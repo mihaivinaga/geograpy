@@ -99,7 +99,7 @@ class PlaceContext(object):
 
         for key, values in geos.items():
             if key in l:
-                geo_value = re.sub("[ .,']+", "", l[key])
+                geo_value = re.sub("[- .,']+", "", l[key])
                 where += ' and ('
                 str_or = ''
                 for value in values:
