@@ -37,10 +37,10 @@ class PlaceContext(object):
             "subdivision_2_iso_code TEXT,"
             "subdivision_2_name TEXT,"
             "city_name TEXT,"
-            "city_name_v2 TEXT,"
             "metro_code TEXT,"
             "time_zone TEXT,"
-            "is_in_european_union INTEGER)"
+            "is_in_european_union INTEGER,"
+            "city_name_v2 TEXT)"
         )
         cur_dir = os.path.dirname(os.path.realpath(__file__))
         with open(cur_dir + "/data/GeoLite2-City-Locations.csv", "rt") as info:
