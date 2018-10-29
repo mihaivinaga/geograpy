@@ -113,7 +113,7 @@ class PlaceContext(object):
 
         select_columns = ', '.join(columns)
 
-        query = "SELECT DISTINCT " + select_columns + " FROM cities WHERE 1" + where + " LIMIT 1"
+        query = "SELECT DISTINCT " + select_columns + " FROM cities WHERE 1" + where
 
         cur.execute(query)
         rows = cur.fetchall()
@@ -129,7 +129,7 @@ class PlaceContext(object):
             except IndexError:
                 pass
 
-        if len(rows):
+        if len(rows) == 1:
             return new_data
         else:
             return None
