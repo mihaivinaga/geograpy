@@ -95,10 +95,14 @@ class PlaceContext(object):
             "city": ['city_name', 'city_name_v2']
         }
 
-        if 'city' not in l and 'city_district' in l:
+        if 'city' in l:
+            columns.append('lower(city_name) as city')
+        elif 'city' not in l and 'city_district' in l:
             geos['city_district'] = ['city_name', 'city_name_v2']
+            columns.append('lower(city_name) as city')
         elif 'city' not in l and 'city_district' not in l and 'suburb' in l:
             geos['suburb'] = ['city_name', 'city_name_v2']
+            columns.append('lower(city_name) as city')
 
         for key, values in geos.items():
             if key in l:
