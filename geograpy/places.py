@@ -128,6 +128,7 @@ class PlaceContext(object):
                 new_data['city'] = row[4]
             except IndexError:
                 pass
+            break
 
         if len(rows) == 1:
             return new_data
