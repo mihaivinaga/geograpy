@@ -37,6 +37,7 @@ class PlaceContext(object):
             "subdivision_2_iso_code TEXT,"
             "subdivision_2_name TEXT,"
             "city_name TEXT,"
+            "city_name_v2 TEXT,"
             "metro_code TEXT,"
             "time_zone TEXT,"
             "is_in_european_union INTEGER)"
@@ -46,7 +47,7 @@ class PlaceContext(object):
             reader = csv.reader(info)
             for row in reader:
                 cur.execute(
-                    "INSERT INTO cities VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
+                    "INSERT INTO cities VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
                     row)
 
             self.conn.commit()
@@ -89,28 +90,28 @@ class PlaceContext(object):
         ]
 
         if "country" in l:
-            country = re.sub("[ \.,']+", "", l['country'])
+            country = re.sub("[ .,']+", "", l['country'])
             where += ' and (REPLACE(REPLACE(country_iso_code, \' \', \'\'), \'.\', \'\') like "' + country + '" OR REPLACE(REPLACE(secondary_iso_code, \' \', \'\'), \'.\', \'\') like "' + country + '" OR REPLACE(REPLACE(country_name, \' \', \'\'), \'.\', \'\') like "' + country + '")'
             l.pop('country', None)
 
         if "state" in l:
-            state = re.sub("[ \.,']+", "", l['state'])
+            state = re.sub("[ .,']+", "", l['state'])
             where += ' and (REPLACE(REPLACE(subdivision_1_iso_code, \' \', \'\'), \'.\', \'\') like "' + state + '" OR REPLACE(REPLACE(subdivision_1_name, \' \', \'\'), \'.\', \'\') like "' + state + '")'
             l.pop('state', None)
 
         if "city" in l:
-            city = re.sub("[ \.,']+", "", l['city'])
-            where += ' and (REPLACE(REPLACE(city_name, \' \', \'\'), \'.\', \'\') like "' + city + '")'
+            city = re.sub("[ .,']+", "", l['city'])
+            where += ' and (REPLACE(REPLACE(city_name, \' \', \'\'), \'.\', \'\') like "' + city + '") OR REPLACE(REPLACE(city_name_v2, \' \', \'\'), \'.\', \'\') like "' + city + '")'
             l.pop('city', None)
             columns.append('lower(city_name) as city')
         elif "city_district" in l:
-            city = re.sub("[ \.,']+", "", l['city_district'])
-            where += ' and (REPLACE(REPLACE(city_name, \' \', \'\'), \'.\', \'\') like "' + city + '")'
+            city = re.sub("[ .,']+", "", l['city_district'])
+            where += ' and (REPLACE(REPLACE(city_name, \' \', \'\'), \'.\', \'\') like "' + city + '") OR REPLACE(REPLACE(city_name_v2, \' \', \'\'), \'.\', \'\') like "' + city + '")'
             l.pop('city_district', None)
             columns.append('lower(city_name) as city')
         elif "suburb" in l:
-            city = re.sub("[ \.,']+", "", l['suburb'])
-            where += ' and (REPLACE(REPLACE(city_name, \' \', \'\'), \'.\', \'\') like "' + city + '")'
+            city = re.sub("[ .,']+", "", l['suburb'])
+            where += ' and (REPLACE(REPLACE(city_name, \' \', \'\'), \'.\', \'\') like "' + city + '") OR REPLACE(REPLACE(city_name_v2, \' \', \'\'), \'.\', \'\') like "' + city + '")'
             l.pop('suburb', None)
             columns.append('lower(city_name) as city')
 
