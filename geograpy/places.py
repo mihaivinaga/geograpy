@@ -17,7 +17,7 @@ class PlaceContext(object):
     def __init__(self, place_names, db_file=None):
         db_file = db_file or os.path.dirname(
             os.path.realpath(__file__)) + "/locs.db"
-        self.conn = sqlite3.connect(db_file, timeout=10)
+        self.conn = sqlite3.connect(db_file, timeout=10, check_same_thread=False)
         self.conn.text_factory = lambda x: str(x, 'utf-8', 'ignore')
         self.places = place_names
 
