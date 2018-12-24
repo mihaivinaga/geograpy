@@ -1,30 +1,49 @@
 from setuptools import setup
 import os
 import sys
-if sys.version_info > (2,7):
-   ins = ['numpy','nltk','newspaper3k','jellyfish','pycountry', 'unidecode']
+from geograpy.places import PlaceContext
+
+if sys.version_info > (2, 7):
+    ins = ['numpy', 'nltk', 'newspaper3k', 'jellyfish', 'pycountry', 'unidecode']
 else:
-   ins = ['numpy','nltk','newspaper','jellyfish','pycountry']
+    ins = ['numpy', 'nltk', 'newspaper', 'jellyfish', 'pycountry']
+
+from setuptools.command.install import install
+
+
+class PostInstallCommand(install):
+    """Post-installation for installation mode."""
+
+    def run(self):
+        pc = PlaceContext('')
+        pc.populate_db()
+
 
 try:
-   import pypandoc
-   long_description = pypandoc.convert('README.md', 'rst')
+    import pypandoc
+
+    long_description = pypandoc.convert('README.md', 'rst')
+
 except (IOError, ImportError):
-   long_description = open('README.md').read()
+    long_description = open('README.md').read()
 
 setup(name='geograpy',
       version='0.3.7',
       description='Extract countries, regions and cities from a URL or text',
       long_description=long_description,
       url='https://github.com/reach2ashish/geograpy',
-      download_url ='https://github.com/reach2ashish/geograpy/tarball/0.3.4',
+      download_url='https://github.com/reach2ashish/geograpy/tarball/0.3.4',
       author='Jonathon Morgan',
       author_email='jonathon@ushahidi.com',
       license='MIT',
       packages=['geograpy'],
       install_requires=ins,
       scripts=['geograpy/bin/geograpy-nltk'],
-      package_data = {
-            'geograpy': ['data/*.csv'],
+      package_data={
+          'geograpy': ['data/*.csv'],
       },
-      zip_safe=False)
+      zip_safe=False,
+      cmdclass={
+          'install': PostInstallCommand,
+      }
+      )
