@@ -77,9 +77,6 @@ class PlaceContext(object):
         return s
 
     def get_location(self, l):
-        if not self.db_has_data():
-            self.populate_db()
-
         cur = self.conn.cursor()
         where = ''
         new_data = {}
@@ -110,7 +107,8 @@ class PlaceContext(object):
                 where += ' and ('
                 str_or = ''
                 for value in values:
-                    where += str_or + 'REPLACE(REPLACE(REPLACE("' + value + '", \' \', \'\'), \'.\', \'\'), \'-\', \'\') like "' + unidecode(geo_value) + '"'
+                    where += str_or + 'REPLACE(REPLACE(REPLACE("' + value + '", \' \', \'\'), \'.\', \'\'), \'-\', \'\') like "' + unidecode(
+                        geo_value) + '"'
                     str_or = ' OR '
                 l.pop(key, None)
                 where += ' )'

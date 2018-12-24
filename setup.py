@@ -1,23 +1,11 @@
 from setuptools import setup
 import os
 import sys
-from geograpy.places import PlaceContext
 
 if sys.version_info > (2, 7):
     ins = ['numpy', 'nltk', 'newspaper3k', 'jellyfish', 'pycountry', 'unidecode']
 else:
     ins = ['numpy', 'nltk', 'newspaper', 'jellyfish', 'pycountry']
-
-from setuptools.command.install import install
-
-
-class PostInstallCommand(install):
-    """Post-installation for installation mode."""
-
-    def run(self):
-        pc = PlaceContext('')
-        pc.populate_db()
-
 
 try:
     import pypandoc
@@ -43,7 +31,4 @@ setup(name='geograpy',
           'geograpy': ['data/*.csv'],
       },
       zip_safe=False,
-      cmdclass={
-          'install': PostInstallCommand,
-      }
       )
