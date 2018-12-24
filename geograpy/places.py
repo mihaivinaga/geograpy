@@ -44,7 +44,7 @@ class PlaceContext(object):
             "city_name_v2 TEXT)"
         )
         cur_dir = os.path.dirname(os.path.realpath(__file__))
-        with open(cur_dir + "/data/GeoLite2-City-Locations.csv", "rt") as info:
+        with open(cur_dir + "/data/GeoLite2-City-Locations.csv", "rt", encoding="utf-8") as info:
             reader = csv.reader(info)
             for row in reader:
                 cur.execute(
