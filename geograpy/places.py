@@ -87,18 +87,18 @@ class PlaceContext(object):
             'lower(subdivision_1_name) as region_name'
         ]
         geos = {
-            "country": ['country_iso_code', 'secondary_iso_code', 'country_name'],
-            "state": ['subdivision_1_iso_code', 'subdivision_1_name'],
-            "city": ['city_name', 'city_name_v2']
+            "country": ['country_iso_code_key', 'secondary_iso_code_key', 'country_name_key'],
+            "state": ['subdivision_1_iso_code_key', 'subdivision_1_name_key'],
+            "city": ['city_name_key', 'city_name_v2_key']
         }
 
         if 'city' in l:
             columns.append('lower(city_name) as city')
         elif 'city' not in l and 'city_district' in l:
-            geos['city_district'] = ['city_name', 'city_name_v2']
+            geos['city_district'] = ['city_name_key', 'city_name_v2_key']
             columns.append('lower(city_name) as city')
         elif 'city' not in l and 'city_district' not in l and 'suburb' in l:
-            geos['suburb'] = ['city_name', 'city_name_v2']
+            geos['suburb'] = ['city_name_key', 'city_name_v2_key']
             columns.append('lower(city_name) as city')
 
         for key, values in geos.items():
@@ -107,8 +107,8 @@ class PlaceContext(object):
                 where += ' and ('
                 str_or = ''
                 for value in values:
-                    where += str_or + 'REPLACE(REPLACE(REPLACE("' + value + '", \' \', \'\'), \'.\', \'\'), \'-\', \'\') like "' + unidecode(
-                        geo_value) + '"'
+                    value = value.strip()
+                    where += str_or + value + ' like "' + unidecode(geo_value) + '"'
                     str_or = ' OR '
                 l.pop(key, None)
                 where += ' )'
