@@ -28,7 +28,7 @@ setup(name='geograpy',
       install_requires=ins,
       scripts=['geograpy/bin/geograpy-nltk'],
       package_data={
-          'geograpy': ['data/*.csv'],
+          'geograpy': ['data/*'],
       },
       zip_safe=False,
       )
