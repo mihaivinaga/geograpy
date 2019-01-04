@@ -21,38 +21,6 @@ class PlaceContext(object):
         self.conn.text_factory = lambda x: str(x, 'utf-8', 'ignore')
         self.places = place_names
 
-    def populate_db(self):
-        cur = self.conn.cursor()
-        cur.execute("DROP TABLE IF EXISTS cities")
-
-        cur.execute(
-            "CREATE TABLE cities("
-            "geoname_id INTEGER,"
-            "continent_code TEXT,"
-            "continent_name TEXT,"
-            "country_iso_code TEXT,"
-            "secondary_iso_code TEXT,"
-            "country_name TEXT,"
-            "subdivision_1_iso_code TEXT,"
-            "subdivision_1_name TEXT,"
-            "subdivision_2_iso_code TEXT,"
-            "subdivision_2_name TEXT,"
-            "city_name TEXT,"
-            "metro_code TEXT,"
-            "time_zone TEXT,"
-            "is_in_european_union INTEGER,"
-            "city_name_v2 TEXT)"
-        )
-        cur_dir = os.path.dirname(os.path.realpath(__file__))
-        with open(cur_dir + "/data/GeoLite2-City-Locations.csv", "rt", encoding="utf-8") as info:
-            reader = csv.reader(info)
-            for row in reader:
-                cur.execute(
-                    "INSERT INTO cities VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);",
-                    row)
-
-            self.conn.commit()
-
     def db_has_data(self):
         cur = self.conn.cursor()
 
@@ -150,9 +118,6 @@ class PlaceContext(object):
             return False
 
     def places_by_name(self, place_name, column_name):
-        if not self.db_has_data():
-            self.populate_db()
-
         cur = self.conn.cursor()
         cur.execute('SELECT * FROM cities WHERE ' + column_name + ' like "' + place_name + '"')
         rows = cur.fetchall()
@@ -225,9 +190,6 @@ class PlaceContext(object):
 
         if not self.regions:
             self.set_regions()
-
-        if not self.db_has_data():
-            self.populate_db()
 
         cur = self.conn.cursor()
         cur.execute("SELECT * FROM cities WHERE city_name IN (" + ",".join(
