@@ -76,7 +76,7 @@ class PlaceContext(object):
                 str_or = ''
                 for value in values:
                     value = value.strip()
-                    where += str_or + value + ' like "' + unidecode(geo_value) + '"'
+                    where += str_or + value + ' = "' + unidecode(geo_value) + '"'
                     str_or = ' OR '
                 l.pop(key, None)
                 where += ' )'
