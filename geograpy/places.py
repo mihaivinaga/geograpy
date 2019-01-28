@@ -103,7 +103,7 @@ class PlaceContext(object):
             new_data['region_name'] = row[5]
 
             try:
-                new_data['city'] = row[4]
+                new_data['city'] = row[6]
             except IndexError:
                 pass
             break
