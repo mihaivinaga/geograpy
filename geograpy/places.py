@@ -49,6 +49,8 @@ class PlaceContext(object):
         where = ''
         new_data = {}
         columns = [
+            'lower(continent_code) as continent_code',
+            'lower(continent_name) as continent_name',
             'lower(country_iso_code) as country_iso_code',
             'lower(country_name) as country_name',
             'lower(subdivision_1_iso_code) as region_code',
@@ -93,10 +95,12 @@ class PlaceContext(object):
             print("database locked")
 
         for row in rows:
-            new_data['country_code'] = row[0]
-            new_data['country_name'] = row[1]
-            new_data['region_code'] = row[2]
-            new_data['region_name'] = row[3]
+            new_data['continent_code'] = row[0]
+            new_data['continent_name'] = row[1]
+            new_data['country_code'] = row[2]
+            new_data['country_name'] = row[3]
+            new_data['region_code'] = row[4]
+            new_data['region_name'] = row[5]
 
             try:
                 new_data['city'] = row[4]
