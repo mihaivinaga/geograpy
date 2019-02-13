@@ -93,15 +93,13 @@ class PlaceContext(object):
             print("database locked")
 
         for row in rows:
-            new_data['continent_code'] = row[0]
-            new_data['continent_name'] = row[1]
-            new_data['country_code'] = row[2]
-            new_data['country_name'] = row[3]
-            new_data['region_code'] = row[4]
-            new_data['region_name'] = row[5]
+            new_data['country_code'] = row[0]
+            new_data['country_name'] = row[1]
+            new_data['region_code'] = row[2]
+            new_data['region_name'] = row[3]
 
             try:
-                new_data['city'] = row[6]
+                new_data['city'] = row[4]
             except IndexError:
                 pass
             break
