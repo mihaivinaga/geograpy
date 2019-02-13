@@ -49,8 +49,6 @@ class PlaceContext(object):
         where = ''
         new_data = {}
         columns = [
-            'lower(continent_code) as continent_code',
-            'lower(continent_name) as continent_name',
             'lower(country_iso_code) as country_iso_code',
             'lower(country_name) as country_name',
             'lower(subdivision_1_iso_code) as region_code',
