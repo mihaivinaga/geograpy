@@ -57,7 +57,7 @@ class PlaceContext(object):
         geos = {
             "country": ['country_iso_code_key="%s"', 'secondary_iso_code_key="%s"', 'country_name_key="%s"'],
             "state": ['subdivision_1_iso_code_key="%s"', 'subdivision_1_name_key="%s"',
-                      'subdivision_2_iso_code_key="%s"', 'subdivision_2_name_key="%s"'],
+                      'subdivision_2_iso_code like "%s"', 'subdivision_2_name  like "%s"'],
             "city": ['city_name_key like "%s%%"', 'city_name_key like "%%%s"', 'city_name_v2_key like "%%%s"',
                      'city_name_v2_key like "%s%%"']
         }
