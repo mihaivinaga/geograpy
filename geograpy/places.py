@@ -57,19 +57,19 @@ class PlaceContext(object):
         geos = {
             "country": ['country_iso_code_key="%s"', 'secondary_iso_code_key="%s"', 'country_name_key="%s"'],
             "state": ['subdivision_1_iso_code_key="%s"', 'subdivision_1_name_key="%s"'],
-            "city": ['city_name_key like "%s%"', 'city_name_key like "%%s"', 'city_name_v2_key like "%%s"',
-                     'city_name_v2_key like "%s%"']
+            "city": ['city_name_key like "%s%%"', 'city_name_key like "%%%s"', 'city_name_v2_key like "%%%s"',
+                     'city_name_v2_key like "%s%%"']
         }
 
         if 'city' in l:
             columns.append('lower(city_name) as city')
         elif 'city' not in l and 'city_district' in l:
-            geos['city_district'] = ['city_name_key like "%s%"', 'city_name_key like "%%s"',
-                                     'city_name_v2_key like "%%s"', 'city_name_v2_key like "%s%"']
+            geos['city_district'] = ['city_name_key like "%s%%"', 'city_name_key like "%%%s"',
+                                     'city_name_v2_key like "%%%s"', 'city_name_v2_key like "%s%%"']
             columns.append('lower(city_name) as city')
         elif 'city' not in l and 'city_district' not in l and 'suburb' in l:
-            geos['suburb'] = ['city_name_key like "%s%"', 'city_name_key like "%%s"', 'city_name_v2_key like "%%s"',
-                              'city_name_v2_key like "%s%"']
+            geos['suburb'] = ['city_name_key like "%s%%"', 'city_name_key like "%%%s"', 'city_name_v2_key like "%%%s"',
+                              'city_name_v2_key like "%s%%"']
             columns.append('lower(city_name) as city')
 
         for key, values in geos.items():
