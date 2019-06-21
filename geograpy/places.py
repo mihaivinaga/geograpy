@@ -87,7 +87,7 @@ class PlaceContext(object):
 
         select_columns = ', '.join(columns)
 
-        query = "SELECT " + select_columns + " FROM cities WHERE 1" + where + ' LIMIT 1'
+        query = "SELECT " + select_columns + " FROM cities WHERE 1" + where
         rows = []
 
         try:
@@ -95,6 +95,9 @@ class PlaceContext(object):
             rows = cur.fetchall()
         except sqlite3.OperationalError:
             print("database locked")
+
+        if len(rows) > 1:
+            return None
 
         for row in rows:
             new_data['country_code'] = row[0]
