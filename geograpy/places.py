@@ -91,7 +91,7 @@ class PlaceContext(object):
 
         select_columns = ', '.join(columns)
 
-        query = "SELECT " + select_columns + " FROM cities WHERE 1" + where
+        query = "SELECT DISTINCT " + select_columns + " FROM cities WHERE 1" + where
         if number_of_filters == 1:
             query += ' LIMIT 1'
         rows = []
