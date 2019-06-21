@@ -48,6 +48,7 @@ class PlaceContext(object):
         cur = self.conn.cursor()
         where = ''
         new_data = {}
+        number_of_filters = 0
         columns = [
             'lower(country_iso_code) as country_iso_code',
             'lower(country_name) as country_name',
@@ -75,6 +76,7 @@ class PlaceContext(object):
 
         for key, values in geos.items():
             if key in l:
+                number_of_filters += 1
                 geo_value = re.sub("[- .,']+", "", l[key])
                 where += ' and ('
                 str_or = ''
@@ -88,6 +90,8 @@ class PlaceContext(object):
         select_columns = ', '.join(columns)
 
         query = "SELECT " + select_columns + " FROM cities WHERE 1" + where
+        if number_of_filters == 1:
+            query += ' LIMIT 1'
         rows = []
 
         try:
