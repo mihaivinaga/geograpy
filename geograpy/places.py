@@ -46,15 +46,8 @@ class PlaceContext(object):
 
     def get_location(self, l):
         cur = self.conn.cursor()
-        where = ''
         new_data = {}
-        number_of_filters = 0
-        columns = [
-            'lower(country_iso_code) as country_iso_code',
-            'lower(country_name) as country_name',
-            'lower(subdivision_1_iso_code) as region_code',
-            'lower(subdivision_1_name) as region_name'
-        ]
+        rows = []
         geos = {
             "country": ['country_iso_code_key="%s"', 'secondary_iso_code_key="%s"', 'country_name_key="%s"'],
             "country_region": ['subdivision_1_iso_code_key="%s"', 'subdivision_1_name_key="%s"',
@@ -64,6 +57,50 @@ class PlaceContext(object):
             "city": ['city_name_key like "%s"', 'city_name_key like "%s"', 'city_name_v2_key like "%s"',
                      'city_name_v2_key like "%s"']
         }
+        try:
+            query = self.get_query(l, geos)
+            cur.execute(query)
+            rows = cur.fetchall()
+
+            if len(rows) == 0:
+                geos["city"] = ['city_name_key like "%s%%"', 'city_name_key like "%%%s"',
+                                'city_name_v2_key like "%%%s"', 'city_name_v2_key like "%s%%"']
+                query = self.get_query(l, geos)
+                cur.execute(query)
+                rows = cur.fetchall()
+
+        except sqlite3.OperationalError:
+            print("database locked")
+
+        if len(rows) > 1:
+            return None
+
+        for row in rows:
+            new_data['country_code'] = row[0]
+            new_data['country_name'] = row[1]
+            new_data['region_code'] = row[2]
+            new_data['region_name'] = row[3]
+
+            try:
+                new_data['city'] = row[4]
+            except IndexError:
+                pass
+            break
+
+        if len(rows) == 1:
+            return new_data
+        else:
+            return None
+
+    def get_query(self, l, geos):
+        where = ''
+        number_of_filters = 0
+        columns = [
+            'lower(country_iso_code) as country_iso_code',
+            'lower(country_name) as country_name',
+            'lower(subdivision_1_iso_code) as region_code',
+            'lower(subdivision_1_name) as region_name'
+        ]
 
         if 'city' in l:
             columns.append('lower(city_name) as city')
@@ -91,34 +128,7 @@ class PlaceContext(object):
 
         select_columns = ', '.join(columns)
 
-        query = "SELECT DISTINCT " + select_columns + " FROM cities WHERE 1" + where
-        rows = []
-
-        try:
-            cur.execute(query)
-            rows = cur.fetchall()
-        except sqlite3.OperationalError:
-            print("database locked")
-
-        if len(rows) > 1:
-            return None
-
-        for row in rows:
-            new_data['country_code'] = row[0]
-            new_data['country_name'] = row[1]
-            new_data['region_code'] = row[2]
-            new_data['region_name'] = row[3]
-
-            try:
-                new_data['city'] = row[4]
-            except IndexError:
-                pass
-            break
-
-        if len(rows) == 1:
-            return new_data
-        else:
-            return None
+        return "SELECT DISTINCT " + select_columns + " FROM cities WHERE 1" + where
 
     def is_a_country(self, s):
         s = self.correct_country_mispelling(s)
