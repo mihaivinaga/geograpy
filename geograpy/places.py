@@ -63,7 +63,7 @@ class PlaceContext(object):
             rows = cur.fetchall()
 
             if len(rows) == 0:
-                geos["city"] = ['city_name_key like "%s%%"', 'city_name_v2_key like "%s%%"']
+                geos["city"] = ['city_name_key like "%s%%"', 'city_name_v2_key like "%%%s"']
                 query = self.get_query(l.copy(), geos)
                 cur.execute(query)
                 rows = cur.fetchall()
